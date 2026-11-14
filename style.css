@@ -995,16 +995,17 @@ button {
   opacity: 0.85;
 }
 
-/* Hidden YouTube Host */
+/* Hidden YouTube Host (Styled to prevent mobile OS background throttle) */
 .yt-host {
-  opacity: 0.001;
+  opacity: 0.0001;
   pointer-events: none;
-  width: 1px;
-  height: 1px;
+  width: 240px;
+  height: 180px;
   position: fixed;
-  bottom: 0;
-  right: 0;
+  top: 0;
+  left: 0;
   z-index: -10;
+  overflow: hidden;
 }
 
 /* Toast Message */

@@ -54,7 +54,8 @@
   const expandedCountBadge = document.getElementById('expandedCountBadge');
   const queueBadge = document.getElementById('queueBadge');
 
-  // Ambient Ghat Sound & Credit
+  // Ambient Ghat Sound, Background Audio Keeper & Credit
+  const bgAudioKeeper = document.getElementById('bgAudioKeeper');
   const ambientSoundBtn = document.getElementById('ambientSoundBtn');
   const ambientSoundText = document.getElementById('ambientSoundText');
   const rohanCredit = document.getElementById('rohanCredit');
@@ -277,10 +278,24 @@
           { src: `https://i.ytimg.com/vi/${song.id}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' }
         ]
       });
-      navigator.mediaSession.setActionHandler('play', () => play());
-      navigator.mediaSession.setActionHandler('pause', () => pause());
-      navigator.mediaSession.setActionHandler('previoustrack', () => prevSong());
-      navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (bgAudioKeeper) bgAudioKeeper.play().catch(() => {});
+        play();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if (bgAudioKeeper) bgAudioKeeper.pause();
+        pause();
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', () => prevSong(true));
+      navigator.mediaSession.setActionHandler('nexttrack', () => nextSong(true));
+      try {
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (player && details.seekTime) {
+            player.seekTo(details.seekTime, true);
+          }
+        });
+      } catch (e) {}
     }
   }
 
@@ -294,6 +309,12 @@
           <path d="M7.5 5h3.2v14H7.5Zm5.8 0h3.2v14h-3.2Z" fill="currentColor"></path>
         </svg>
       `;
+      if (bgAudioKeeper) {
+        bgAudioKeeper.play().catch(() => {});
+      }
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
     } else {
       pillArt.classList.remove('is-spinning');
       playBtn.setAttribute('aria-label', 'बजाईं');
@@ -302,6 +323,12 @@
           <path d="M8 5.2 19 12 8 18.8Z" fill="currentColor"></path>
         </svg>
       `;
+      if (bgAudioKeeper) {
+        bgAudioKeeper.pause();
+      }
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+      }
     }
     updateActiveSongInList();
   }
@@ -313,8 +340,8 @@
   window.onYouTubeIframeAPIReady = function () {
     const current = songs[currentIndex] || songs[0];
     player = new YT.Player('ytPlayer', {
-      height: '1',
-      width: '1',
+      height: '180',
+      width: '240',
       videoId: current.id,
       host: 'https://www.youtube-nocookie.com',
       playerVars: {
@@ -357,6 +384,17 @@
       duration = player.getDuration() || 0;
       startTimeTracking();
     } else if (event.data === 2) { // PAUSED
+      // Check if pause occurred because phone screen was turned off / locked
+      if (isPlaying && document.hidden) {
+        // Keep playing in background on screen lock!
+        if (bgAudioKeeper) bgAudioKeeper.play().catch(() => {});
+        setTimeout(() => {
+          if (isPlaying && player && typeof player.playVideo === 'function') {
+            try { player.playVideo(); } catch (e) {}
+          }
+        }, 120);
+        return;
+      }
       setPlayState(false);
     } else if (event.data === 0) { // ENDED
       nextSong(true);
@@ -369,6 +407,22 @@
     setTimeout(() => nextSong(true), 600);
   }
 
+  // Ensure audio session and player remain active across screen off / tab hide
+  document.addEventListener('visibilitychange', () => {
+    if (isPlaying) {
+      if (bgAudioKeeper) bgAudioKeeper.play().catch(() => {});
+      if (player && typeof player.playVideo === 'function') {
+        try { player.playVideo(); } catch (e) {}
+      }
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    if (isPlaying && bgAudioKeeper) {
+      bgAudioKeeper.play().catch(() => {});
+    }
+  });
+
   // ==========================================================================
   // DIRECT 1-TAP INSTANT PLAYBACK (FIXES NO-PLAY ON SELECTION)
   // ==========================================================================
@@ -378,6 +432,10 @@
     currentIndex = index;
     const song = songs[currentIndex];
     updateSongUI(song);
+
+    if (bgAudioKeeper) {
+      bgAudioKeeper.play().catch(() => {});
+    }
 
     // DIRECT INSTANT PLAYBACK:
     if (player && typeof player.loadVideoById === 'function') {
@@ -404,6 +462,9 @@
 
   function play() {
     if (!player) return;
+    if (bgAudioKeeper) {
+      bgAudioKeeper.play().catch(() => {});
+    }
     try {
       player.unMute();
       player.playVideo();
@@ -413,6 +474,9 @@
 
   function pause() {
     if (!player) return;
+    if (bgAudioKeeper) {
+      bgAudioKeeper.pause();
+    }
     try {
       player.pauseVideo();
       setPlayState(false);
