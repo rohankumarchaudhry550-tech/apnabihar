@@ -1,0 +1,12 @@
+{
+  "name": "apnabihar-chhath-ghat",
+  "version": "1.0.0",
+  "description": "छठ घाट — Bihari nostalgia radio clone with 99 ad-free songs, integrated playlist, and live presence",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["chhath", "radio", "bihar", "bhojpuri"],
+  "author": "Rohan",
+  "license": "MIT"
+}

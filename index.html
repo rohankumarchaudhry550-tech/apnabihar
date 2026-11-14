@@ -34,7 +34,7 @@
 </head>
 <body>
 
-  <!-- Background scene with ghat image & atmospheric sunrise glow -->
+  <!-- Background scene with authentic ghat image & sunset atmosphere -->
   <div class="scene" aria-hidden="true"></div>
   <div class="scene-glow" aria-hidden="true"></div>
   <div class="diyas-container" aria-hidden="true" id="diyasContainer"></div>
@@ -44,44 +44,36 @@
     <div id="ytPlayer"></div>
   </div>
 
-  <!-- Top Left: Apna Bihar Brand -->
-  <div class="brand">
-    <span class="brand__name">Apna Bihar</span>
-    <span class="brand__badge">
-      <span class="ad-free-tag">AD-FREE</span> Nostalgia Radio
-    </span>
-  </div>
+  <!-- Top Navigation Header (Spacious, Clean & Uncluttered) -->
+  <header class="top-nav">
+    <!-- Brand logo top left -->
+    <div class="brand">
+      <span class="brand__name">Apna Bihar</span>
+    </div>
 
-  <!-- Center Top: Genuine Real-Time Live Listeners -->
-  <div class="online" title="वास्तविक लाइव श्रोता (Real-time Active Listeners)">
-    <span class="online__dot" aria-hidden="true"></span>
-    <span id="onlineCount">1</span> लाइव श्रोता
-  </div>
+    <!-- Genuine Real-Time Live Listeners -->
+    <div class="online" title="वास्तविक लाइव श्रोता">
+      <span class="online__dot" aria-hidden="true"></span>
+      <span id="onlineCount">1</span> लाइव श्रोता
+    </div>
 
-  <!-- Big Central Title -->
+    <!-- Links top right -->
+    <nav class="links">
+      <a href="https://music.youtube.com/playlist?list=PLAN1r6kMkgwE" target="_blank" rel="noreferrer" title="YouTube Music Playlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+          <path d="M10 8.2 16 12l-6 3.8Z" fill="currentColor"></path>
+        </svg>
+        <span>YT Music</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Big Central Title with generous breathing room -->
   <h1 class="title">छठ घाट</h1>
-
-  <!-- Top Right Navigation -->
-  <nav class="links">
-    <button type="button" class="ghat-bell-btn" id="ambientSoundBtn" title="घाट की पवित्र घंटी व गंगा ध्वनि (Ambience)">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-      </svg>
-      <span id="ambientSoundText">घाट ध्वनि</span>
-    </button>
-    <a href="https://music.youtube.com/playlist?list=PLAN1r6kMkgwE" target="_blank" rel="noreferrer" title="YouTube Music Playlist">
-      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
-        <path d="M10 8.2 16 12l-6 3.8Z" fill="currentColor"></path>
-      </svg>
-      <span>YT Music</span>
-    </a>
-  </nav>
 
   <!-- ======================================================================
        UNIFIED MUSIC PLAYER WITH INTEGRATED SONG LIST
-       (The song list is directly integrated into the player itself!)
        ====================================================================== -->
   <div class="player-container" id="playerContainer">
     
@@ -94,17 +86,24 @@
           <h2 class="expanded-title">
             <span class="expanded-title-icon">🎶</span> छठ गीत सूची
           </h2>
-          <span class="expanded-subtitle" id="expandedCountBadge">99 पारंपरिक छठ गीत</span>
+          <span class="expanded-subtitle" id="expandedCountBadge">99 छठ गीत</span>
         </div>
         <div class="expanded-header-actions">
-          <button type="button" class="header-action-btn" id="shuffleToggleBtn" title="शफल मोड बदलें">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <button type="button" class="header-action-btn" id="ambientSoundBtn" title="घाट की पवित्र घंटी ध्वनि">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span id="ambientSoundText">घाट ध्वनि</span>
+          </button>
+          <button type="button" class="header-action-btn" id="shuffleToggleBtn" title="शफल मोड">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path>
             </svg>
             <span id="shuffleStatusText">शफल</span>
           </button>
           <button type="button" class="close-expanded-btn" id="closeExpandedBtn" aria-label="सूची समेटें" title="समेटें (Collapse)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
@@ -118,7 +117,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="expanded-search-input" id="songSearchInput" placeholder="गाना या गायक खोजें (जैसे शारदा सिन्हा, पवन सिंह)..." autocomplete="off" />
+          <input type="text" class="expanded-search-input" id="songSearchInput" placeholder="गाना या गायक खोजें (उदा. शारदा सिन्हा, पवन सिंह)..." autocomplete="off" />
           <button type="button" class="expanded-search-clear" id="searchClearBtn" aria-label="खोज साफ़ करें">&times;</button>
         </div>
 
@@ -186,7 +185,6 @@
             <path d="M18 5.5h-2.4v13H18ZM5 5.5v13L14.6 12Z" fill="currentColor"></path>
           </svg>
         </button>
-        <!-- Toggle button integrated directly into the player -->
         <button type="button" class="playlist-toggle-btn" id="playlistToggleBtn" aria-label="गीत सूची खोलें/बंद करें" title="गीत सूची (99)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="8" y1="6" x2="21" y2="6"></line>
