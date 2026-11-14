@@ -1,0 +1,596 @@
+window.SONGS = [
+  {
+    "id": "qUeuWi81PmM",
+    "title": "Kelwa Ke Paat Par",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "DG8F-csoRAQ",
+    "title": "Pahile Pahil",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "sdHZn1BFhHY",
+    "title": "Uthau Suruj Bhaile Bihaan",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "_7NbR6nvxQI",
+    "title": "Dukhwa Mitayin",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "oWGtaIu9dG0",
+    "title": "Kaanch Hi Baans Ke Bahangiya",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "-oga0dNKD0k",
+    "title": "Ugg Ho Suraj Dev",
+    "artist": "Anuradha Paudwal",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "GuffNsrHPM8",
+    "title": "Patna Ke Haat Per Nariyar",
+    "artist": "Anuradha Paudwal",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "RhXeLpkXgHQ",
+    "title": "Aath Hi Kath Ke Kothariya Ho Dinanath",
+    "artist": "Sharda Sinha",
+    "lang": "maithili"
+  },
+  {
+    "id": "MaIKJmmGq8k",
+    "title": "Patna Ke Ghat Par Hamhu Araghiya Debai He",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "hSnJsArYrzg",
+    "title": "CHHATHI MAAI AAILI NAIHARVA",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "mFqvZp8FLhg",
+    "title": "Jal Beech Khada Hoee",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "UJpFa66hFs0",
+    "title": "Jode Jode Falwa",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "jsTXjbCGLjA",
+    "title": "Chhathi Mai Ke Aas",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "lcP1gW5Ekbg",
+    "title": "Bini Bini Gehuvaa",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "EMVa61kWfK4",
+    "title": "Ganga Ji Ke Ghaate",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "c-8jgNwUXV0",
+    "title": "Mora Bhaiya Jayela",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "up3_Bx7RvnM",
+    "title": "Darshan Dekhai Dihi",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "21CUPJCqx7g",
+    "title": "Kath Ke Re Naiyiya",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "zTZHb0OV0Uo",
+    "title": "GOLDEN BOWL",
+    "artist": "Manoj Tiwari",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "z23glNZt7fk",
+    "title": "केरवा के पातवा पे नेवता",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "BcmdUySOYvM",
+    "title": "Chhathi Mayi Ayihe Angna",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "m76W1RcKPzo",
+    "title": "Hoyiha Sahay",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "5Nx-gQr9IBA",
+    "title": "Futi Futi Bhorahi Se Rove",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "Z1JJdVBSwRE",
+    "title": "Kosi Kaili Ghar Ujad",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "5AZc_wGr8Sg",
+    "title": "Aragh ke Ber Bhaile",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "3n2bZlzbEJU",
+    "title": "Ugi Suruj Dev",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "v8yOzkbsMaQ",
+    "title": "BULAYE",
+    "artist": "Vishal Mishra",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "OrlnX9zM5-k",
+    "title": "Bulaye",
+    "artist": "CLIK RECORDS",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "YiuywVIXOwc",
+    "title": "Godiya Me Hoihe Balakawa",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "tHvnucD_rpk",
+    "title": "Kelwa Ke Paat Par",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "g63PyJUxvj8",
+    "title": "Aragh Mora Lei Lihin",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "kYzIQwq86gs",
+    "title": "Chanani Taane Chalale",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "mifsBkmS828",
+    "title": "Kopi Kopi Boleli",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "1745Y2D5ZhY",
+    "title": "Darshan Dihi N Apar",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "-U8Un3nb-GI",
+    "title": "Jode Jode Nariyal",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "iB4s7Kv6Pmc",
+    "title": "Ugi He Suruj Mal Naiyo Na Dole",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "e-0FjvSOaw8",
+    "title": "Jai",
+    "artist": "Release",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "HalHmElNzz8",
+    "title": "Kerawa Ke Patawa Pa Newta Pethawani",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "58zmM5G-zVQ",
+    "title": "Kahele Mahadev",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "QKY-vL73kJM",
+    "title": "Oriye Oriye Madhu Chuwe",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "6s_j2XtOdhY",
+    "title": "Koshiya Bharaye Lagal",
+    "artist": "Neelkamal Singh Official",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "u5gSGPKcEBA",
+    "title": "Chhathi mai ke karab hum pujaniya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "Tu111Zn3rME",
+    "title": "Chhor ke aai arab",
+    "artist": "Angle Music",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "v7kzVOQY4wM",
+    "title": "माई के बरतिया",
+    "artist": "Khesari Lal Yadav",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "9xNfjeMSsKU",
+    "title": "Chhudchhuri Ae Bhauji",
+    "artist": "Khesari Lal Yadav",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "hKjHe_sWbsI",
+    "title": "छठी माई बिलाई रुपवा",
+    "artist": "Khesari Lal Yadav",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "KvOeeZB1_70",
+    "title": "माई घरे रोवत होइहे",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "Kc0D3A5Rcd8",
+    "title": "Khesari Lal Yadav & Kajal Raghwani छपरा मे छठ मनाएंगे Chhapra Chhat Manayenge",
+    "artist": "Khesari Lal Yadav",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "lUSbJIYbjQE",
+    "title": "माथ पS दउरवा लेके",
+    "artist": "Worldwide Records Bhojpuri",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "BKoD7bTLc2k",
+    "title": "पवन सिंह का सबसे ज्यादा बजने वाला",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "KaUVffFlvEg",
+    "title": "Badri Cheer Ke Bahri Aayi",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "RhAn_IBF0Bw",
+    "title": "Kanche Kanche Banswa Ke",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "eqFN5vqRai4",
+    "title": "Ugi Jayi Hey Gosaiya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "sOF7TnCM1T4",
+    "title": "Ke Parbiya Karab Saiya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "emWA5xFjdso",
+    "title": "Dihi Darshan Suruj Gosaiya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "3bErukA873s",
+    "title": "Piyari Pahir La",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "oqi4EdCAGIM",
+    "title": "धनिया हमार नया बाड़ी हो",
+    "artist": "Worldwide Records Bhojpuri",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "4c5EWtfAi50",
+    "title": "AAHO DINANATH",
+    "artist": "T-Series Bhakti Sagar",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "dWHI5NoN2-8",
+    "title": "Patna Ke Ghat Par Develu Aradhiya",
+    "artist": "T-Series Bhakti Sagar",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "S_YA76qkqr8",
+    "title": "Char Pahar Jal Thal Sevila",
+    "artist": "T-Series Bhakti Sagar",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "VkYrntXiEX8",
+    "title": "Patna Ke Ghatva Par Baaje",
+    "artist": "T-Series Bhakti Sagar",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "Rxa5wi_roTU",
+    "title": "Chhatth Kara Na",
+    "artist": "Allah Souls",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "qpXEGwpOIW4",
+    "title": "Falwa Bharal Daurwa",
+    "artist": "Allah Souls",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "-Ulzm5WMdSU",
+    "title": "Bhore Bhore Boleli Chuchuiya",
+    "artist": "Allah Souls",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "NAgyXILyzKw",
+    "title": "Kartik Ke",
+    "artist": "Allah Souls",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "0LdXcprLDi4",
+    "title": "Chal Chhath Ghatiya",
+    "artist": "Allah Souls",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "k_-YP6hB0lg",
+    "title": "Vrat",
+    "artist": "Dinesh Lal Yadav",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "AJsZwUqq6Sg",
+    "title": "Ghatiye Swarg Lagela",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "WwFbOnh0H2M",
+    "title": "Raua Se Ehe Hathjoriya Nu Ho",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "sbCxpbcDJu0",
+    "title": "Kalpeli Bhijal Tiwaiya",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "st3QsmFpiY8",
+    "title": "Jagmag Jarela Deeyariya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "ePnrkF6VQ44",
+    "title": "Ghare Ghare Hota Chhathi Maai Ke Varatiya",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "f9oJxSy7WbQ",
+    "title": "Patna Ke Ghatva Per Baaje",
+    "artist": "Chhaila Bihari Official",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "D2AOTHoHdDg",
+    "title": "Sundar Suhavan Laage Suraj Mandirava",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "_g77YfqoHvA",
+    "title": "Lahar Mare Dhire Dhire 🌅",
+    "artist": "Devi",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "3XlqzDoSK0U",
+    "title": "Bhukhal Piyasal Tiwaiya",
+    "artist": "Chandan Kr Verma",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "90fBzppEPDA",
+    "title": "Pahile Pahil Ham Kaini Chhathi Maiya Sharda Sinha",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "bhxtHgRHd3M",
+    "title": "Daura Uthao Na Bihari Babu",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "qGiyP8gd_D8",
+    "title": "Ug Ho Suraj Dev",
+    "artist": "Anuradha Paudwal",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "b39ZfGLLdOc",
+    "title": "Ganga Ji Ke Nirmal Paniya",
+    "artist": "Kallu Music World",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "nvMly-Q55YU",
+    "title": "Nevta Bilaai Mausi Aa Gailee Baate",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "EuDCnKwJgCM",
+    "title": "Nariyalwa Aradh Chadhe Ho",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "FXaCyCQ1eh0",
+    "title": "आ गया सबसे बड़ा #चइता_छठ गीत",
+    "artist": "Sanjivani Music - Bhakti",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "G3PMFpftpbg",
+    "title": "Jode Jode Supwa Tora Chadaibo Bhojpuri Chhath Geet KALPANA",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "er0EO-Zp904",
+    "title": "Asiya Puran Hoy",
+    "artist": "T-Series Bhakti Sagar",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "j9G3caThH98",
+    "title": "Uthau Suruj Bhaile Bihaan By Sharda Sinha",
+    "artist": "Sharda Sinha",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "SFd9-Auy__4",
+    "title": "मथवा प लेके दउरवा",
+    "artist": "Neelkamal Singh Official",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "83MjixCl1mY",
+    "title": "Mahima Chhatth Maiya Ke Apaar",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "g-9SB-slnKQ",
+    "title": "Pehanle Mahadev Piyariya",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "dX2SZyzTz2w",
+    "title": "Chhathi Maai Ke Mahima Apar",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "lFNkdalPySU",
+    "title": "Jagmag Jare Diyanwa Na Ho",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "_x8bosq6kUM",
+    "title": "Vrat",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "_UfH3gNFUPk",
+    "title": "Bhail Araghiya Ke Ber-",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "so7fhvKshE0",
+    "title": "युगे-युगे रखिया ख़याल",
+    "artist": "Wave Music Bhakti",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "UfJPSi3fCUc",
+    "title": "Nindiya Ke Maatal Dev",
+    "artist": "Anuradha Paudwal",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "pyIlmF13E0o",
+    "title": "😭😭#Pawan Singh का यह छठ गीत सुनकर दिल दहल जायेगा",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "DyT8etMKKnE",
+    "title": "उगी हे आदितमल",
+    "artist": "Kalpana Patowary",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "8BfbY0vb7Ro",
+    "title": "आहे आदितमल",
+    "artist": "PANDEY SISTERS  OFFICIAL",
+    "lang": "bhojpuri"
+  },
+  {
+    "id": "ISKoGMr5NOU",
+    "title": "Ke Hota Aagman",
+    "artist": "Pawan Singh",
+    "lang": "bhojpuri"
+  }
+];
