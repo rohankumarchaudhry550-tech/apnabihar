@@ -76,22 +76,86 @@
   <h1 class="title">छठ घाट</h1>
 
   <!-- ======================================================================
-       UNIFIED MUSIC PLAYER WITH INTEGRATED SONG LIST
+       MAIN FLOATING PLAYER PILL (STABLE, CRISP, NEVER DEFORMED)
        ====================================================================== -->
-  <div class="player-container" id="playerContainer">
+  <div class="pill" id="mainPill">
     
-    <!-- Expanded Playlist Panel (blooms directly out of the player) -->
-    <div class="player-expanded-panel" id="playerExpandedPanel">
-      
-      <!-- Panel Top Header -->
-      <div class="expanded-header">
-        <div class="expanded-title-area">
-          <h2 class="expanded-title">
-            <span class="expanded-title-icon">🎶</span> छठ गीत सूची
-          </h2>
-          <span class="expanded-subtitle" id="expandedCountBadge">99 छठ गीत</span>
+    <!-- Spinning Vinyl CD Artwork -->
+    <div class="pill__art" id="pillArt" title="Play / Pause">
+      <img id="pillArtImg" src="covers/qUeuWi81PmM.jpg" alt="" draggable="false" />
+    </div>
+
+    <!-- Song Meta (Clicking anywhere here opens the playlist sheet!) -->
+    <div class="pill__meta" id="pillMetaToggle" title="गीत सूची देखने के लिए क्लिक करें">
+      <div class="pill__title_row">
+        <p class="pill__title" id="pillTitle">लोड हो रहल बा...</p>
+        <div class="mini-equalizer" id="miniEqualizer" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
         </div>
-        <div class="expanded-header-actions">
+      </div>
+      <div class="pill__artist_row">
+        <p class="pill__artist" id="pillArtist">...</p>
+        <span class="pill__list_hint">गीत सूची (99) ▴</span>
+      </div>
+      <button type="button" class="pill__seek" id="pillSeek" aria-label="गाना आगे-पीछे करीं">
+        <span class="pill__rail">
+          <span class="pill__fill" id="pillFill" style="width: 0%;"></span>
+        </span>
+      </button>
+      <p class="pill__time" id="pillTime">0:00 / 0:00</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="pill__controls">
+      <button type="button" class="skip" id="prevBtn" aria-label="पिछला गाना" title="पिछला गाना (Left Arrow)">
+        <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 5.5h2.4v13H6Zm13 0v13L9.4 12Z" fill="currentColor"></path>
+        </svg>
+      </button>
+      <button type="button" class="play" id="playBtn" aria-label="बजाईं" title="Play / Pause (Spacebar)">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5.2 19 12 8 18.8Z" fill="currentColor"></path>
+        </svg>
+      </button>
+      <button type="button" class="skip" id="nextBtn" aria-label="अगला गाना" title="अगला गाना (Right Arrow)">
+        <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 5.5h-2.4v13H18ZM5 5.5v13L14.6 12Z" fill="currentColor"></path>
+        </svg>
+      </button>
+      <!-- Playlist toggle button on player -->
+      <button type="button" class="playlist-toggle-btn" id="playlistToggleBtn" aria-label="गीत सूची खोलें" title="गीत सूची (99)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span class="queue-badge" id="queueBadge">99</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       ELEGANT SLIDE-UP PLAYLIST SHEET (ZERO SHRINKING, 100% SMOOTH)
+       ====================================================================== -->
+  <div class="playlist-sheet" id="playlistSheet" role="dialog" aria-modal="true" aria-label="छठ गीत सूची">
+    <div class="playlist-sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="playlist-sheet-content">
+      
+      <!-- Drag handle indicator on mobile -->
+      <div class="sheet-drag-handle" id="sheetDragHandle"></div>
+
+      <!-- Sheet Top Header -->
+      <div class="sheet-header">
+        <div class="sheet-title-area">
+          <h2 class="sheet-title">
+            <span class="sheet-title-icon">🎶</span> छठ गीत सूची
+          </h2>
+          <span class="sheet-subtitle" id="expandedCountBadge">99 छठ गीत</span>
+        </div>
+        <div class="sheet-header-actions">
           <button type="button" class="header-action-btn" id="ambientSoundBtn" title="घाट की पवित्र घंटी ध्वनि">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -105,27 +169,28 @@
             </svg>
             <span id="shuffleStatusText">शफल</span>
           </button>
-          <button type="button" class="close-expanded-btn" id="closeExpandedBtn" aria-label="सूची समेटें" title="समेटें (Collapse)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <polyline points="6 9 12 15 18 9"></polyline>
+          <button type="button" class="close-sheet-btn" id="closeExpandedBtn" aria-label="सूची बंद करें" title="बंद करें">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
       </div>
 
       <!-- Search Box & Filter Chips -->
-      <div class="expanded-toolbar">
-        <div class="expanded-search-box">
-          <svg class="expanded-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="sheet-toolbar">
+        <div class="sheet-search-box">
+          <svg class="sheet-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="expanded-search-input" id="songSearchInput" placeholder="गाना या गायक खोजें (उदा. शारदा सिन्हा, पवन सिंह)..." autocomplete="off" />
-          <button type="button" class="expanded-search-clear" id="searchClearBtn" aria-label="खोज साफ़ करें">&times;</button>
+          <input type="text" class="sheet-search-input" id="songSearchInput" placeholder="गाना या गायक खोजें (उदा. शारदा सिन्हा, पवन सिंह)..." autocomplete="off" />
+          <button type="button" class="sheet-search-clear" id="searchClearBtn" aria-label="खोज साफ़ करें">&times;</button>
         </div>
 
         <!-- Singer Filter Chips -->
-        <div class="expanded-chips" id="singerChips">
+        <div class="sheet-chips" id="singerChips">
           <button type="button" class="chip-btn active" data-filter="all">सभी गीत (99)</button>
           <button type="button" class="chip-btn" data-filter="Sharda Sinha">🌺 शारदा सिन्हा</button>
           <button type="button" class="chip-btn" data-filter="Anuradha Paudwal">🌸 अनुराधा पौडवाल</button>
@@ -138,67 +203,8 @@
       </div>
 
       <!-- Scrollable List of Songs -->
-      <div class="expanded-song-list" id="expandedSongList">
+      <div class="sheet-song-list" id="expandedSongList">
         <!-- Rendered dynamically by app.js -->
-      </div>
-    </div>
-
-    <!-- Main Player Pill (Docked / Control Center) -->
-    <div class="pill" id="mainPill">
-      
-      <!-- Spinning Vinyl CD Artwork -->
-      <div class="pill__art" id="pillArt" title="Play / Pause">
-        <img id="pillArtImg" src="covers/qUeuWi81PmM.jpg" alt="" draggable="false" />
-      </div>
-
-      <!-- Song Meta (Clicking anywhere here expands the integrated list!) -->
-      <div class="pill__meta" id="pillMetaToggle" title="गीत सूची देखने के लिए क्लिक करें">
-        <div class="pill__title_row">
-          <p class="pill__title" id="pillTitle">लोड हो रहल बा...</p>
-          <div class="mini-equalizer" id="miniEqualizer" aria-hidden="true">
-            <span></span><span></span><span></span><span></span>
-          </div>
-        </div>
-        <div class="pill__artist_row">
-          <p class="pill__artist" id="pillArtist">...</p>
-          <span class="pill__list_hint">गीत सूची ▾</span>
-        </div>
-        <button type="button" class="pill__seek" id="pillSeek" aria-label="गाना आगे-पीछे करीं">
-          <span class="pill__rail">
-            <span class="pill__fill" id="pillFill" style="width: 0%;"></span>
-          </span>
-        </button>
-        <p class="pill__time" id="pillTime">0:00 / 0:00</p>
-      </div>
-
-      <!-- Controls -->
-      <div class="pill__controls">
-        <button type="button" class="skip" id="prevBtn" aria-label="पिछला गाना" title="पिछला गाना (Left Arrow)">
-          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 5.5h2.4v13H6Zm13 0v13L9.4 12Z" fill="currentColor"></path>
-          </svg>
-        </button>
-        <button type="button" class="play" id="playBtn" aria-label="बजाईं" title="Play / Pause (Spacebar)">
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 5.2 19 12 8 18.8Z" fill="currentColor"></path>
-          </svg>
-        </button>
-        <button type="button" class="skip" id="nextBtn" aria-label="अगला गाना" title="अगला गाना (Right Arrow)">
-          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18 5.5h-2.4v13H18ZM5 5.5v13L14.6 12Z" fill="currentColor"></path>
-          </svg>
-        </button>
-        <button type="button" class="playlist-toggle-btn" id="playlistToggleBtn" aria-label="गीत सूची खोलें/बंद करें" title="गीत सूची (99)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-          </svg>
-          <span class="queue-badge" id="queueBadge">99</span>
-        </button>
       </div>
     </div>
   </div>

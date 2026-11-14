@@ -28,7 +28,9 @@
   } catch (e) {}
 
   // --- DOM Elements ---
-  const playerContainer = document.getElementById('playerContainer');
+  const playlistSheet = document.getElementById('playlistSheet');
+  const sheetBackdrop = document.getElementById('sheetBackdrop');
+  const sheetDragHandle = document.getElementById('sheetDragHandle');
   const mainPill = document.getElementById('mainPill');
   const pillArt = document.getElementById('pillArt');
   const pillArtImg = document.getElementById('pillArtImg');
@@ -589,49 +591,62 @@
   });
 
   // ==========================================================================
-  // INTEGRATED PLAYLIST EXPANSION & INTERACTION
+  // PLAYLIST SHEET SLIDE-UP & TOUCH INTERACTION (ZERO SHRINKING)
   // ==========================================================================
 
-  function togglePlayerExpansion() {
-    const isExpanded = playerContainer.classList.contains('is-expanded');
-    if (isExpanded) {
-      collapsePlayer();
+  function togglePlaylistSheet() {
+    const isOpen = playlistSheet.classList.contains('is-open');
+    if (isOpen) {
+      closePlaylistSheet();
     } else {
-      expandPlayer();
+      openPlaylistSheet();
     }
   }
 
-  function expandPlayer() {
-    playerContainer.classList.add('is-expanded');
+  function openPlaylistSheet() {
+    playlistSheet.classList.add('is-open');
+    playlistToggleBtn.classList.add('is-active');
     renderSongsList();
     scrollActiveSongIntoView();
   }
 
-  function collapsePlayer() {
-    playerContainer.classList.remove('is-expanded');
+  function closePlaylistSheet() {
+    playlistSheet.classList.remove('is-open');
+    playlistToggleBtn.classList.remove('is-active');
   }
 
   playlistToggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    togglePlayerExpansion();
+    togglePlaylistSheet();
   });
 
   pillMetaToggle.addEventListener('click', (e) => {
-    // If not clicking seek bar, toggle list
+    // If not clicking seek bar, open sheet
     if (e.target.closest('#pillSeek')) return;
-    togglePlayerExpansion();
+    togglePlaylistSheet();
   });
 
-  closeExpandedBtn.addEventListener('click', collapsePlayer);
+  closeExpandedBtn?.addEventListener('click', closePlaylistSheet);
+  sheetBackdrop?.addEventListener('click', closePlaylistSheet);
 
-  // Close when clicking outside player
-  document.addEventListener('click', (e) => {
-    if (!playerContainer.contains(e.target)) {
-      collapsePlayer();
-    }
-  });
+  // Swipe/drag down to close sheet on touch screens
+  let touchStartY = 0;
+  const sheetContent = playlistSheet?.querySelector('.playlist-sheet-content');
+  if (sheetContent) {
+    sheetContent.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
 
-  // Shuffle toggle button in expanded header
+    sheetContent.addEventListener('touchmove', (e) => {
+      const touchY = e.touches[0].clientY;
+      const diff = touchY - touchStartY;
+      if (diff > 90 && expandedSongList.scrollTop <= 0) {
+        closePlaylistSheet();
+      }
+    }, { passive: true });
+  }
+
+  // Shuffle toggle button in sheet header
   shuffleToggleBtn.addEventListener('click', () => {
     isShuffle = !isShuffle;
     shuffleToggleBtn.classList.toggle('is-active', isShuffle);
@@ -826,7 +841,7 @@
       prevSong(true);
     } else if (e.key.toLowerCase() === 'l' || e.key.toLowerCase() === 'p') {
       e.preventDefault();
-      togglePlayerExpansion();
+      togglePlaylistSheet();
     }
   });
 
