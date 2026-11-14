@@ -1,6 +1,7 @@
 /**
  * छठ घाट — Bihari Nostalgia Radio
  * Cloned & Enhanced for Rohan
+ * Integrated Player, 99 Chhath Songs, Genuine Live Listeners & Direct 1-Tap Playback
  */
 
 (function () {
@@ -8,72 +9,60 @@
 
   // --- Global State ---
   const songs = window.SONGS || [];
-  let playlist = [...songs];
   let currentIndex = 0;
   let player = null;
   let isPlayerReady = false;
   let isPlaying = false;
   let isShuffle = true;
-  let isLoop = false;
   let currentTime = 0;
   let duration = 0;
   let progressInterval = null;
   let isDraggingSeek = false;
-  let consecutiveErrors = 0;
+  let favorites = new Set();
+  let pendingPlaySongId = null;
+
+  // Load favorites from localStorage
+  try {
+    const savedFavs = JSON.parse(localStorage.getItem('apnabihar_favs') || '[]');
+    savedFavs.forEach(id => favorites.add(id));
+  } catch (e) {}
 
   // --- DOM Elements ---
-  const artContainer = document.getElementById('pillArt');
-  const artImg = document.getElementById('pillArtImg');
-  const songTitleEl = document.getElementById('pillTitle');
-  const songArtistEl = document.getElementById('pillArtist');
-  const seekBtn = document.getElementById('pillSeek');
-  const fillBar = document.getElementById('pillFill');
-  const timeDisplay = document.getElementById('pillTime');
+  const playerContainer = document.getElementById('playerContainer');
+  const mainPill = document.getElementById('mainPill');
+  const pillArt = document.getElementById('pillArt');
+  const pillArtImg = document.getElementById('pillArtImg');
+  const pillTitle = document.getElementById('pillTitle');
+  const pillArtist = document.getElementById('pillArtist');
+  const pillSeek = document.getElementById('pillSeek');
+  const pillFill = document.getElementById('pillFill');
+  const pillTime = document.getElementById('pillTime');
   const playBtn = document.getElementById('playBtn');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
-  const onlineCountEl = document.getElementById('onlineCount');
+  const playlistToggleBtn = document.getElementById('playlistToggleBtn');
+  const pillMetaToggle = document.getElementById('pillMetaToggle');
+  const closeExpandedBtn = document.getElementById('closeExpandedBtn');
+  const shuffleToggleBtn = document.getElementById('shuffleToggleBtn');
+  const shuffleStatusText = document.getElementById('shuffleStatusText');
 
-  // Playlist drawer elements
-  const playlistDrawer = document.getElementById('playlistDrawer');
-  const playlistBackdrop = document.getElementById('playlistBackdrop');
-  const openPlaylistBtn = document.getElementById('openPlaylistBtn');
-  const playlistPillBtn = document.getElementById('playlistPillBtn');
-  const closePlaylistBtn = document.getElementById('closePlaylistBtn');
-  const playlistItemsContainer = document.getElementById('playlistItems');
-  const searchInput = document.getElementById('playlistSearch');
-  const searchClear = document.getElementById('searchClear');
-  const chipsContainer = document.getElementById('playlistChips');
-  const shuffleBtn = document.getElementById('shuffleActionBtn');
-  const totalSongsCount = document.getElementById('totalSongsCount');
+  // List & Search Elements
+  const expandedSongList = document.getElementById('expandedSongList');
+  const songSearchInput = document.getElementById('songSearchInput');
+  const searchClearBtn = document.getElementById('searchClearBtn');
+  const singerChips = document.getElementById('singerChips');
+  const expandedCountBadge = document.getElementById('expandedCountBadge');
+  const queueBadge = document.getElementById('queueBadge');
 
-  // Suggestion modal elements
-  const suggestBtn = document.getElementById('suggestBtn');
-  const suggestModal = document.getElementById('suggestModal');
-  const modalBackdrop = document.getElementById('modalBackdrop');
-  const modalCloseBtn = document.getElementById('modalCloseBtn');
-  const suggestForm = document.getElementById('suggestForm');
-  const suggestSuccess = document.getElementById('suggestSuccess');
-  const submitAnotherBtn = document.getElementById('submitAnotherBtn');
-
-  // Credit & Toast
+  // Ambient Ghat Sound & Credit
+  const ambientSoundBtn = document.getElementById('ambientSoundBtn');
+  const ambientSoundText = document.getElementById('ambientSoundText');
   const rohanCredit = document.getElementById('rohanCredit');
   const toastEl = document.getElementById('toast');
+  const onlineCountEl = document.getElementById('onlineCount');
 
-  // --- Shuffle helper (Fisher-Yates) ---
-  function shuffleArray(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  // Initial random song pick
-  if (isShuffle && songs.length > 0) {
-    currentIndex = Math.floor(Math.random() * songs.length);
-  }
+  // Initial random song or #1 masterpiece (Kelwa Ke Paat Par by Sharda Sinha)
+  currentIndex = 0; // Starts at legendary #1 track
 
   // --- Format Seconds into M:SS ---
   function formatTime(sec) {
@@ -85,7 +74,7 @@
 
   // --- Toast notification ---
   let toastTimer = null;
-  function showToast(msg, durationMs = 3000) {
+  function showToast(msg, durationMs = 2800) {
     if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.classList.add('show');
@@ -95,39 +84,187 @@
     }, durationMs);
   }
 
-  // --- Online Presence Simulator ---
-  let currentOnline = 34 + Math.floor(Math.random() * 8);
-  if (onlineCountEl) onlineCountEl.textContent = currentOnline;
+  // ==========================================================================
+  // GENUINE REAL-TIME PRESENCE (ACTUAL LIVE LISTENERS)
+  // ==========================================================================
 
-  setInterval(() => {
-    const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-    currentOnline = Math.max(28, Math.min(52, currentOnline + change));
-    if (onlineCountEl) onlineCountEl.textContent = currentOnline;
-  }, 16000);
+  const SESSION_KEY = 'apnabihar_session_uuid';
+  let mySessionId = sessionStorage.getItem(SESSION_KEY);
+  if (!mySessionId) {
+    mySessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+    sessionStorage.setItem(SESSION_KEY, mySessionId);
+  }
 
-  // --- Update UI with Current Song Details ---
+  // Local tab synchronization for 100% genuine multi-tab count
+  const broadcast = window.BroadcastChannel ? new BroadcastChannel('apnabihar_presence_bus') : null;
+
+  async function reportPresence() {
+    try {
+      const res = await fetch('/api/presence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: mySessionId })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && typeof data.count === 'number') {
+          updateLiveCountDisplay(data.count);
+          return;
+        }
+      }
+    } catch (e) {
+      // Fallback to local multi-tab heartbeat
+    }
+
+    // LocalStorage fallback for actual alive tabs
+    try {
+      const now = Date.now();
+      const tabs = JSON.parse(localStorage.getItem('apnabihar_active_tabs') || '{}');
+      tabs[mySessionId] = now;
+      // Clean dead tabs older than 18 seconds
+      for (const [id, seen] of Object.entries(tabs)) {
+        if (now - seen > 18000) delete tabs[id];
+      }
+      localStorage.setItem('apnabihar_active_tabs', JSON.stringify(tabs));
+      const actualCount = Math.max(1, Object.keys(tabs).length);
+      updateLiveCountDisplay(actualCount);
+    } catch (e) {
+      updateLiveCountDisplay(1);
+    }
+  }
+
+  function updateLiveCountDisplay(count) {
+    if (onlineCountEl) {
+      onlineCountEl.textContent = count;
+    }
+  }
+
+  // Heartbeat every 8 seconds
+  reportPresence();
+  setInterval(reportPresence, 8000);
+
+  // Clean on unload
+  window.addEventListener('beforeunload', () => {
+    try {
+      const tabs = JSON.parse(localStorage.getItem('apnabihar_active_tabs') || '{}');
+      delete tabs[mySessionId];
+      localStorage.setItem('apnabihar_active_tabs', JSON.stringify(tabs));
+    } catch (e) {}
+  });
+
+  // ==========================================================================
+  // FLOATING RIVER DIYAS GENERATOR
+  // ==========================================================================
+  const diyasContainer = document.getElementById('diyasContainer');
+  if (diyasContainer) {
+    function spawnDiya() {
+      const diya = document.createElement('div');
+      diya.className = 'floating-diya';
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * (window.innerHeight * 0.22);
+      const duration = 14 + Math.random() * 12;
+
+      diya.style.left = `${startX}px`;
+      diya.style.bottom = `${startY}px`;
+      diya.style.animationDuration = `${duration}s`;
+
+      diyasContainer.appendChild(diya);
+      setTimeout(() => diya.remove(), duration * 1000);
+    }
+
+    for (let i = 0; i < 6; i++) {
+      setTimeout(spawnDiya, i * 1800);
+    }
+    setInterval(spawnDiya, 3500);
+  }
+
+  // ==========================================================================
+  // GHAT AMBIENCE AUDIO (SACRED BELL & RIVER BREEZE)
+  // ==========================================================================
+  let audioCtx = null;
+  let isAmbientOn = false;
+  let bellTimer = null;
+
+  function initAudioContext() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playTempleBell() {
+    if (!audioCtx || !isAmbientOn) return;
+    try {
+      const now = audioCtx.currentTime;
+      // Resonant fundamental + harmonics of a temple brass bell
+      const freqs = [587.33, 880, 1174.66, 1760]; // D5 note harmonics
+      freqs.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = idx === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        const initialGain = 0.08 / (idx + 1);
+        gain.gain.setValueAtTime(initialGain, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.5);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 3.6);
+      });
+    } catch (e) {}
+  }
+
+  function toggleAmbientSound() {
+    initAudioContext();
+    isAmbientOn = !isAmbientOn;
+    if (isAmbientOn) {
+      ambientSoundBtn.classList.add('is-playing');
+      ambientSoundText.textContent = 'ध्वनि चालू';
+      showToast('घाट की पावन घंटी चालू भइल 🔔', 2500);
+      playTempleBell();
+      bellTimer = setInterval(playTempleBell, 12000);
+    } else {
+      ambientSoundBtn.classList.remove('is-playing');
+      ambientSoundText.textContent = 'घाट ध्वनि';
+      clearInterval(bellTimer);
+      showToast('घाट ध्वनि बंद', 1800);
+    }
+  }
+
+  ambientSoundBtn?.addEventListener('click', toggleAmbientSound);
+
+  // ==========================================================================
+  // PLAYER UI & TRACK DETAILS
+  // ==========================================================================
+
   function updateSongUI(song) {
     if (!song) return;
 
-    songTitleEl.textContent = song.title;
-    songTitleEl.title = `${song.title} — ${song.artist}`;
-    songArtistEl.textContent = song.artist;
+    pillTitle.textContent = song.title;
+    pillTitle.title = `${song.title} — ${song.artist}`;
+    pillArtist.textContent = song.artist;
     document.title = `${song.title} — छठ घाट`;
 
     // Local cover with automatic fallback to YouTube HQ thumbnail
     const coverSrc = `covers/${song.id}.jpg`;
-    artImg.onerror = function () {
+    pillArtImg.onerror = function () {
       this.onerror = null;
       this.src = `https://i.ytimg.com/vi/${song.id}/hqdefault.jpg`;
     };
-    artImg.src = coverSrc;
+    pillArtImg.src = coverSrc;
 
-    // Reset progress
-    fillBar.style.width = '0%';
-    timeDisplay.textContent = '0:00 / 0:00';
+    // Reset progress fill
+    pillFill.style.width = '0%';
+    pillTime.textContent = '0:00 / 0:00';
 
-    // Update active state in playlist drawer
-    updateActivePlaylistItem();
+    updateActiveSongInList();
 
     // Setup Media Session API (Mobile lockscreen & notifications)
     if ('mediaSession' in navigator) {
@@ -150,7 +287,7 @@
   function setPlayState(playing) {
     isPlaying = playing;
     if (playing) {
-      artContainer.classList.add('is-spinning');
+      pillArt.classList.add('is-spinning');
       playBtn.setAttribute('aria-label', 'रोकीं');
       playBtn.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
@@ -158,7 +295,7 @@
         </svg>
       `;
     } else {
-      artContainer.classList.remove('is-spinning');
+      pillArt.classList.remove('is-spinning');
       playBtn.setAttribute('aria-label', 'बजाईं');
       playBtn.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
@@ -166,10 +303,13 @@
         </svg>
       `;
     }
-    updateActivePlaylistItem();
+    updateActiveSongInList();
   }
 
-  // --- YouTube IFrame API Setup (Privacy & Ad-Free Host) ---
+  // ==========================================================================
+  // YOUTUBE PLAYER INITIALIZATION & PLAYBACK
+  // ==========================================================================
+
   window.onYouTubeIframeAPIReady = function () {
     const current = songs[currentIndex] || songs[0];
     player = new YT.Player('ytPlayer', {
@@ -199,63 +339,39 @@
   function onPlayerReady(event) {
     isPlayerReady = true;
     player.setVolume(100);
+    player.unMute();
     const song = songs[currentIndex];
     updateSongUI(song);
+
+    if (pendingPlaySongId) {
+      player.loadVideoById(pendingPlaySongId);
+      player.playVideo();
+      setPlayState(true);
+      pendingPlaySongId = null;
+    }
   }
 
   function onPlayerStateChange(event) {
-    // YT.PlayerState: PLAYING = 1, PAUSED = 2, ENDED = 0, BUFFERING = 3
-    if (event.data === 1) {
-      consecutiveErrors = 0;
+    if (event.data === 1) { // PLAYING
       setPlayState(true);
       duration = player.getDuration() || 0;
       startTimeTracking();
-    } else if (event.data === 2) {
+    } else if (event.data === 2) { // PAUSED
       setPlayState(false);
-    } else if (event.data === 0) {
-      // Song finished
-      if (isLoop) {
-        player.seekTo(0, true);
-        player.playVideo();
-      } else {
-        nextSong(true);
-      }
+    } else if (event.data === 0) { // ENDED
+      nextSong(true);
     }
   }
 
   function onPlayerError(event) {
-    console.warn(`[छठ घाट] YouTube error code ${event.data} on song ${songs[currentIndex]?.title}`);
-    consecutiveErrors++;
-    if (consecutiveErrors < songs.length) {
-      showToast('अगला गाना लोड हो रहा है...', 2000);
-      setTimeout(() => nextSong(true), 600);
-    } else {
-      showToast('कवनो गाना लोड ना हो पावल', 4000);
-      setPlayState(false);
-    }
+    console.warn(`[छठ घाट] Video error ${event.data} on: ${songs[currentIndex]?.title}`);
+    showToast('अगला गाना लोड हो रहल बा...', 2000);
+    setTimeout(() => nextSong(true), 600);
   }
 
-  // --- Playback Controls ---
-  function play() {
-    if (!isPlayerReady || !player) return;
-    player.playVideo();
-    setPlayState(true);
-  }
-
-  function pause() {
-    if (!isPlayerReady || !player) return;
-    player.pauseVideo();
-    setPlayState(false);
-  }
-
-  function togglePlay() {
-    if (!isPlayerReady || !player) return;
-    if (isPlaying) {
-      pause();
-    } else {
-      play();
-    }
-  }
+  // ==========================================================================
+  // DIRECT 1-TAP INSTANT PLAYBACK (FIXES NO-PLAY ON SELECTION)
+  // ==========================================================================
 
   function playSongByIndex(index, autoPlay = true) {
     if (index < 0 || index >= songs.length) return;
@@ -263,14 +379,51 @@
     const song = songs[currentIndex];
     updateSongUI(song);
 
+    // DIRECT INSTANT PLAYBACK:
     if (player && typeof player.loadVideoById === 'function') {
-      if (autoPlay) {
+      try {
+        player.loadVideoById({
+          videoId: song.id,
+          startSeconds: 0
+        });
+        player.unMute();
+        player.setVolume(100);
+        player.playVideo();
+      } catch (e) {
         player.loadVideoById(song.id);
-        setPlayState(true);
-      } else {
-        player.cueVideoById(song.id);
-        setPlayState(false);
+        player.playVideo();
       }
+    } else {
+      pendingPlaySongId = song.id;
+    }
+
+    setPlayState(true);
+    startTimeTracking();
+    showToast(`बज रहल बा: ${song.title}`, 2400);
+  }
+
+  function play() {
+    if (!player) return;
+    try {
+      player.unMute();
+      player.playVideo();
+      setPlayState(true);
+    } catch (e) {}
+  }
+
+  function pause() {
+    if (!player) return;
+    try {
+      player.pauseVideo();
+      setPlayState(false);
+    } catch (e) {}
+  }
+
+  function togglePlay() {
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
     }
   }
 
@@ -288,7 +441,6 @@
   }
 
   function prevSong(autoPlay = true) {
-    // If more than 3 seconds in, restart current song
     if (player && typeof player.getCurrentTime === 'function' && player.getCurrentTime() > 3) {
       player.seekTo(0, true);
       return;
@@ -297,46 +449,45 @@
     playSongByIndex(prevIdx, autoPlay);
   }
 
-  // --- Time Progress & Seeking ---
+  // ==========================================================================
+  // TIME TRACKING & TOUCH SCRUBBING
+  // ==========================================================================
+
   function startTimeTracking() {
     clearInterval(progressInterval);
     progressInterval = setInterval(() => {
-      if (!isPlayerReady || !player || isDraggingSeek) return;
-      if (typeof player.getCurrentTime === 'function') {
-        currentTime = player.getCurrentTime() || 0;
-        const dur = player.getDuration() || duration || 0;
-        if (dur > 0) duration = dur;
+      if (!player || isDraggingSeek || typeof player.getCurrentTime !== 'function') return;
+      currentTime = player.getCurrentTime() || 0;
+      const dur = player.getDuration() || duration || 0;
+      if (dur > 0) duration = dur;
 
-        const pct = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
-        fillBar.style.width = `${pct}%`;
-        timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-      }
+      const pct = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+      pillFill.style.width = `${pct}%`;
+      pillTime.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
     }, 200);
   }
 
   function handleSeek(e) {
-    const rect = seekBtn.getBoundingClientRect();
+    const rect = pillSeek.getBoundingClientRect();
     const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
 
-    fillBar.style.width = `${ratio * 100}%`;
+    pillFill.style.width = `${ratio * 100}%`;
     if (duration > 0) {
-      const targetTime = ratio * duration;
-      timeDisplay.textContent = `${formatTime(targetTime)} / ${formatTime(duration)}`;
+      const target = ratio * duration;
+      pillTime.textContent = `${formatTime(target)} / ${formatTime(duration)}`;
     }
     return ratio;
   }
 
-  seekBtn.addEventListener('click', (e) => {
+  pillSeek.addEventListener('click', (e) => {
     const ratio = handleSeek(e);
-    if (player && typeof player.seekTo === 'function' && duration > 0) {
+    if (player && duration > 0) {
       player.seekTo(ratio * duration, true);
-      currentTime = ratio * duration;
     }
   });
 
-  // Touch scrubbing support for phones
-  seekBtn.addEventListener('touchstart', (e) => {
+  pillSeek.addEventListener('touchstart', (e) => {
     isDraggingSeek = true;
     handleSeek(e);
   }, { passive: true });
@@ -346,80 +497,135 @@
     handleSeek(e);
   }, { passive: true });
 
-  window.addEventListener('touchend', (e) => {
+  window.addEventListener('touchend', () => {
     if (!isDraggingSeek) return;
     isDraggingSeek = false;
-    const ratio = parseFloat(fillBar.style.width) / 100;
-    if (player && typeof player.seekTo === 'function' && duration > 0) {
+    const ratio = parseFloat(pillFill.style.width) / 100;
+    if (player && duration > 0) {
       player.seekTo(ratio * duration, true);
     }
   });
 
-  // --- Event Listeners for Player Pill ---
-  playBtn.addEventListener('click', togglePlay);
-  nextBtn.addEventListener('click', () => nextSong(true));
-  prevBtn.addEventListener('click', () => prevSong(true));
-  artContainer.addEventListener('click', togglePlay);
-
-  // --- Keyboard Shortcuts ---
-  window.addEventListener('keydown', (e) => {
-    const isTyping = e.target.closest('input, textarea, select');
-    if (isTyping) return;
-
-    if (e.code === 'Space') {
-      e.preventDefault();
-      togglePlay();
-    } else if (e.code === 'ArrowRight') {
-      e.preventDefault();
-      nextSong(true);
-    } else if (e.code === 'ArrowLeft') {
-      e.preventDefault();
-      prevSong(true);
-    } else if (e.key.toLowerCase() === 'l' || e.key.toLowerCase() === 'p') {
-      e.preventDefault();
-      togglePlaylistDrawer();
-    }
+  // Pill control events
+  playBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePlay();
+  });
+  nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    nextSong(true);
+  });
+  prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    prevSong(true);
+  });
+  pillArt.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePlay();
   });
 
   // ==========================================================================
-  // PLAYLIST DRAWER RENDERING & SEARCH
+  // INTEGRATED PLAYLIST EXPANSION & INTERACTION
   // ==========================================================================
 
-  let activeArtistFilter = 'all';
+  function togglePlayerExpansion() {
+    const isExpanded = playerContainer.classList.contains('is-expanded');
+    if (isExpanded) {
+      collapsePlayer();
+    } else {
+      expandPlayer();
+    }
+  }
+
+  function expandPlayer() {
+    playerContainer.classList.add('is-expanded');
+    renderSongsList();
+    scrollActiveSongIntoView();
+  }
+
+  function collapsePlayer() {
+    playerContainer.classList.remove('is-expanded');
+  }
+
+  playlistToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePlayerExpansion();
+  });
+
+  pillMetaToggle.addEventListener('click', (e) => {
+    // If not clicking seek bar, toggle list
+    if (e.target.closest('#pillSeek')) return;
+    togglePlayerExpansion();
+  });
+
+  closeExpandedBtn.addEventListener('click', collapsePlayer);
+
+  // Close when clicking outside player
+  document.addEventListener('click', (e) => {
+    if (!playerContainer.contains(e.target)) {
+      collapsePlayer();
+    }
+  });
+
+  // Shuffle toggle button in expanded header
+  shuffleToggleBtn.addEventListener('click', () => {
+    isShuffle = !isShuffle;
+    shuffleToggleBtn.classList.toggle('is-active', isShuffle);
+    shuffleStatusText.textContent = isShuffle ? 'शफल' : 'क्रमवार';
+    showToast(isShuffle ? 'शफल मोड चालू' : 'क्रमवार मोड चालू', 1800);
+  });
+
+  // ==========================================================================
+  // SONG LIST RENDERING, SEARCH & FILTERING
+  // ==========================================================================
+
+  let activeSingerFilter = 'all';
   let searchQuery = '';
 
-  // Filter songs based on search and artist chip
   function getFilteredSongs() {
     return songs.map((song, originalIdx) => ({ song, originalIdx })).filter(({ song }) => {
-      const matchesArtist = activeArtistFilter === 'all' || song.artist.toLowerCase().includes(activeArtistFilter.toLowerCase());
+      // Favorite filter
+      if (activeSingerFilter === 'favs') {
+        if (!favorites.has(song.id)) return false;
+      } else if (activeSingerFilter !== 'all') {
+        if (!song.artist.toLowerCase().includes(activeSingerFilter.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // Search filter
       const q = searchQuery.toLowerCase().trim();
-      const matchesSearch = !q || song.title.toLowerCase().includes(q) || song.artist.toLowerCase().includes(q);
-      return matchesArtist && matchesSearch;
+      if (q) {
+        const matchTitle = song.title.toLowerCase().includes(q);
+        const matchArtist = song.artist.toLowerCase().includes(q);
+        if (!matchTitle && !matchArtist) return false;
+      }
+
+      return true;
     });
   }
 
-  function renderPlaylist() {
+  function renderSongsList() {
     const filtered = getFilteredSongs();
-    playlistItemsContainer.innerHTML = '';
+    expandedSongList.innerHTML = '';
 
     if (filtered.length === 0) {
-      playlistItemsContainer.innerHTML = `
-        <div class="playlist-empty">
-          <p>कवनो गाना ना मिलल 🔍</p>
-          <span style="font-size:0.8rem;opacity:0.7;">कृपया दूसरा नाम या गायक खोजें</span>
+      expandedSongList.innerHTML = `
+        <div style="text-align:center; padding:3rem 1rem; color:rgba(255,255,255,0.5); font-size:0.875rem;">
+          <p style="margin:0 0 0.4rem; font-size:1.1rem;">कवनो गाना ना मिलल 🔍</p>
+          <span>कृपया दूसरा नाम या गायक खोजें</span>
         </div>
       `;
       return;
     }
 
     filtered.forEach(({ song, originalIdx }, displayIdx) => {
-      const card = document.createElement('button');
-      card.type = 'button';
+      const card = document.createElement('div');
       card.className = `song-card ${originalIdx === currentIndex ? 'is-active' : ''}`;
       card.setAttribute('data-index', originalIdx);
-      card.setAttribute('aria-label', `${song.title} — ${song.artist}`);
 
       const trackNum = String(displayIdx + 1).padStart(2, '0');
+      const isFav = favorites.has(song.id);
 
       card.innerHTML = `
         <span class="song-num">${trackNum}</span>
@@ -435,6 +641,11 @@
           <p class="song-title">${escapeHTML(song.title)}</p>
           <p class="song-artist">${escapeHTML(song.artist)}</p>
         </div>
+        <button type="button" class="song-fav-btn ${isFav ? 'is-fav' : ''}" title="पसंदीदा (Favorite)" data-id="${song.id}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
         <div class="song-play-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5.2 19 12 8 18.8Z"></path>
@@ -442,21 +653,50 @@
         </div>
       `;
 
-      card.addEventListener('click', () => {
+      // DIRECT 1-TAP PLAY: Click card to play immediately!
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.song-fav-btn')) return;
         playSongByIndex(originalIdx, true);
-        showToast(`बज रहल बा: ${song.title}`, 2200);
       });
 
-      playlistItemsContainer.appendChild(card);
+      // Favorite toggle
+      const favBtn = card.querySelector('.song-fav-btn');
+      favBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFavorite(song.id, favBtn);
+      });
+
+      expandedSongList.appendChild(card);
     });
 
-    if (totalSongsCount) {
-      totalSongsCount.textContent = `${filtered.length} / ${songs.length} छठ गीत`;
+    if (expandedCountBadge) {
+      expandedCountBadge.textContent = `${filtered.length} / ${songs.length} छठ गीत`;
     }
   }
 
-  function updateActivePlaylistItem() {
-    const cards = playlistItemsContainer.querySelectorAll('.song-card');
+  function toggleFavorite(id, btn) {
+    if (favorites.has(id)) {
+      favorites.delete(id);
+      btn.classList.remove('is-fav');
+      btn.querySelector('svg').setAttribute('fill', 'none');
+      showToast('पसंदीदा से हटावल गइल', 1600);
+    } else {
+      favorites.add(id);
+      btn.classList.add('is-fav');
+      btn.querySelector('svg').setAttribute('fill', 'currentColor');
+      showToast('पसंदीदा में जोड़ल गइल ❤️', 1600);
+    }
+    try {
+      localStorage.setItem('apnabihar_favs', JSON.stringify(Array.from(favorites)));
+    } catch (e) {}
+
+    if (activeSingerFilter === 'favs') {
+      renderSongsList();
+    }
+  }
+
+  function updateActiveSongInList() {
+    const cards = expandedSongList.querySelectorAll('.song-card');
     cards.forEach((card) => {
       const idx = parseInt(card.getAttribute('data-index'), 10);
       if (idx === currentIndex) {
@@ -469,144 +709,68 @@
 
   function scrollActiveSongIntoView() {
     setTimeout(() => {
-      const activeCard = playlistItemsContainer.querySelector('.song-card.is-active');
+      const activeCard = expandedSongList.querySelector('.song-card.is-active');
       if (activeCard) {
         activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 150);
   }
 
-  function togglePlaylistDrawer() {
-    const isOpen = playlistDrawer.classList.contains('is-open');
-    if (isOpen) {
-      closePlaylist();
-    } else {
-      openPlaylist();
-    }
-  }
-
-  function openPlaylist() {
-    playlistDrawer.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    renderPlaylist();
-    scrollActiveSongIntoView();
-  }
-
-  function closePlaylist() {
-    playlistDrawer.classList.remove('is-open');
-    document.body.style.overflow = '';
-  }
-
-  // Drawer events
-  openPlaylistBtn?.addEventListener('click', togglePlaylistDrawer);
-  playlistPillBtn?.addEventListener('click', togglePlaylistDrawer);
-  closePlaylistBtn?.addEventListener('click', closePlaylist);
-  playlistBackdrop?.addEventListener('click', closePlaylist);
-
   // Search input events
-  searchInput?.addEventListener('input', (e) => {
+  songSearchInput?.addEventListener('input', (e) => {
     searchQuery = e.target.value;
-    if (searchClear) {
-      if (searchQuery.length > 0) searchClear.classList.add('visible');
-      else searchClear.classList.remove('visible');
+    if (searchClearBtn) {
+      if (searchQuery.length > 0) searchClearBtn.classList.add('visible');
+      else searchClearBtn.classList.remove('visible');
     }
-    renderPlaylist();
+    renderSongsList();
   });
 
-  searchClear?.addEventListener('click', () => {
-    searchInput.value = '';
+  searchClearBtn?.addEventListener('click', () => {
+    songSearchInput.value = '';
     searchQuery = '';
-    searchClear.classList.remove('visible');
-    renderPlaylist();
-    searchInput.focus();
+    searchClearBtn.classList.remove('visible');
+    renderSongsList();
+    songSearchInput.focus();
   });
 
-  // Artist filter chips
-  chipsContainer?.addEventListener('click', (e) => {
+  // Singer filter chips
+  singerChips?.addEventListener('click', (e) => {
     const chip = e.target.closest('.chip-btn');
     if (!chip) return;
-    chipsContainer.querySelectorAll('.chip-btn').forEach((c) => c.classList.remove('active'));
+    singerChips.querySelectorAll('.chip-btn').forEach((c) => c.classList.remove('active'));
     chip.classList.add('active');
-    activeArtistFilter = chip.getAttribute('data-filter') || 'all';
-    renderPlaylist();
-  });
-
-  // Shuffle toggle button in drawer
-  shuffleBtn?.addEventListener('click', () => {
-    isShuffle = !isShuffle;
-    shuffleBtn.classList.toggle('is-active', isShuffle);
-    shuffleBtn.innerHTML = isShuffle
-      ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg> 🔀 रैंडम चालू`
-      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"></path></svg> 🔁 क्रमवार`;
-    showToast(isShuffle ? 'शफल मोड चालू' : 'क्रमवार मोड चालू', 1800);
+    activeSingerFilter = chip.getAttribute('data-filter') || 'all';
+    renderSongsList();
   });
 
   // ==========================================================================
-  // SUGGESTION MODAL LOGIC
+  // KEYBOARD SHORTCUTS & CREDIT
   // ==========================================================================
 
-  function openSuggestModal() {
-    suggestModal.classList.add('is-open');
-  }
+  window.addEventListener('keydown', (e) => {
+    if (e.target.closest('input, textarea')) return;
 
-  function closeSuggestModal() {
-    suggestModal.classList.remove('is-open');
-    setTimeout(() => {
-      suggestForm.style.display = 'block';
-      suggestSuccess.classList.remove('visible');
-    }, 300);
-  }
-
-  suggestBtn?.addEventListener('click', openSuggestModal);
-  modalCloseBtn?.addEventListener('click', closeSuggestModal);
-  modalBackdrop?.addEventListener('click', closeSuggestModal);
-
-  suggestForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const songName = document.getElementById('suggestSongName')?.value || '';
-    const singer = document.getElementById('suggestSinger')?.value || '';
-    const link = document.getElementById('suggestLink')?.value || '';
-    const user = document.getElementById('suggestUser')?.value || 'अज्ञात';
-
-    const suggestionObj = {
-      songName,
-      singer,
-      link,
-      user,
-      timestamp: new Date().toISOString()
-    };
-
-    // Save to localStorage
-    try {
-      const stored = JSON.parse(localStorage.getItem('apnabihar_suggestions') || '[]');
-      stored.push(suggestionObj);
-      localStorage.setItem('apnabihar_suggestions', JSON.stringify(stored));
-    } catch (err) {
-      console.warn('LocalStorage error:', err);
+    if (e.code === 'Space') {
+      e.preventDefault();
+      togglePlay();
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      nextSong(true);
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      prevSong(true);
+    } else if (e.key.toLowerCase() === 'l' || e.key.toLowerCase() === 'p') {
+      e.preventDefault();
+      togglePlayerExpansion();
     }
-
-    // Display confirmation
-    suggestForm.style.display = 'none';
-    suggestSuccess.classList.add('visible');
-    showToast('सुझाव भेजल गइल! धन्यवाद ❤️', 3000);
   });
-
-  submitAnotherBtn?.addEventListener('click', () => {
-    suggestForm.reset();
-    suggestForm.style.display = 'block';
-    suggestSuccess.classList.remove('visible');
-  });
-
-  // ==========================================================================
-  // MADE BY ROHAN CREDIT INTERACTION
-  // ==========================================================================
 
   rohanCredit?.addEventListener('click', (e) => {
     e.preventDefault();
     showToast('छठ पूजा के पावन अवसर पर Rohan द्वारा निर्मित ❤️', 3500);
   });
 
-  // Utility HTML Escape
   function escapeHTML(str) {
     if (!str) return '';
     return str
@@ -617,9 +781,10 @@
       .replace(/'/g, '&#039;');
   }
 
-  // Initial song load into UI
+  // Initial UI Setup
   if (songs.length > 0) {
     updateSongUI(songs[currentIndex]);
+    if (queueBadge) queueBadge.textContent = songs.length;
   }
 
   // Load YouTube IFrame API script
